@@ -1,3 +1,7 @@
+> **Local setup:** In PowerShell, run `$env:DJANGO_DEBUG="True"` before the Django commands below. On macOS/Linux, use `export DJANGO_DEBUG=True`. Local debug mode generates a temporary signing key; sessions reset on restart.
+>
+> **Production:** Leave debug disabled and configure a new, private `DJANGO_SECRET_KEY` plus `DJANGO_ALLOWED_HOSTS` in your deployment environment. Generate the key locally with `python -c "import secrets; print(secrets.token_urlsafe(50))"`. Never reuse a key from Git history or commit `.env` files.
+
 # AI Inventory Agent
 
 Django inventory assistant by Khalil1400. Includes stock tools, a chat
