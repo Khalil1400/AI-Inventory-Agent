@@ -22,12 +22,23 @@ load_dotenv(BASE_DIR / ".env")
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(erk$#hkpl3w$j4ff%#r5^@@$e57*^=q1u&%p*7(!#19y@d$r!'
+import os
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Read deployment secrets from the process environment.
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in {"1", "true", "yes"}
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        # Local development only: never reuse a public signing key.
+        from django.core.management.utils import get_random_secret_key
+        SECRET_KEY = get_random_secret_key()
+    else:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("Set DJANGO_SECRET_KEY, or DJANGO_DEBUG=True for local development.")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
+    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,[::1]"
+).split(",") if host.strip()]
 
 
 # Application definition
