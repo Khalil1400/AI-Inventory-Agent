@@ -1,34 +1,33 @@
-> **Local setup:** In PowerShell, run `$env:DJANGO_DEBUG="True"` before the Django commands below. On macOS/Linux, use `export DJANGO_DEBUG=True`. Local debug mode generates a temporary signing key; sessions reset on restart.
->
-> **Production:** Leave debug disabled and configure a new, private `DJANGO_SECRET_KEY` plus `DJANGO_ALLOWED_HOSTS` in your deployment environment. Generate the key locally with `python -c "import secrets; print(secrets.token_urlsafe(50))"`. Never reuse a key from Git history or commit `.env` files.
-
 # AI Inventory Agent
 
-Django inventory assistant by Khalil1400. Includes stock tools, a chat
-interface, local command handling, and optional Gemini integration.
+A Django inventory assistant with a chat interface, stock tools, price and VAT calculations, and optional Gemini integration.
 
-## Verified local demonstration
+## Features
 
-The inventory commands and VAT calculation work locally without an API key.
-Gemini responses have not been verified: no valid Gemini key was configured
-for this demonstration. Local command responses do not call an AI model.
+- Add, remove, and inspect inventory using local commands
+- Set item prices and calculate totals with VAT
+- Use a browser-based chat interface
+- Connect Gemini privately for optional AI responses
 
-![Working command demonstration](docs/demo.png)
+![Working local command demonstration](docs/demo.png)
 
-## Run on Windows
+The local inventory commands work without an API key. Live Gemini responses have not been verified.
 
-Requires Python 3.12 or newer.
+## Run locally on Windows
+
+Use Python 3.12 or newer:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+$env:DJANGO_DEBUG="True"
 .\.venv\Scripts\python.exe manage.py migrate
 .\.venv\Scripts\python.exe manage.py check
 .\.venv\Scripts\python.exe manage.py test chat
 .\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8001
 ```
 
-Open http://127.0.0.1:8001/ and try these messages in order:
+On macOS/Linux, activate your environment and use `export DJANGO_DEBUG=True`. Open [localhost:8001](http://127.0.0.1:8001/) and try:
 
 1. `add 10 chocolate bars`
 2. `set price of chocolate bar to 2.00`
@@ -37,20 +36,15 @@ Open http://127.0.0.1:8001/ and try these messages in order:
 5. `check chocolate bars`
 6. `show inventory`
 
-The quote returns 6.60 total and does not change stock. After the removal,
-8 chocolate bars remain.
+The quote returns 6.60 without changing stock. After removal, 8 bars remain.
 
-## Optional Gemini connection
+## Optional Gemini integration
 
-Copy `.env.example` to `.env`, configure `GEMINI_API_KEY` privately, and
-restart the server. The integration in `chat/agent.py` is separate from
-local commands. Its model availability and live API responses require
-verification with a valid key. Do not commit API keys.
+Copy `.env.example` to `.env`, set `GEMINI_API_KEY` privately, and restart. `chat/agent.py` handles Gemini separately from local commands. Model availability and live responses require verification with a valid key.
 
-## Submission
+## Configuration and security
 
-Public repository: https://github.com/Khalil1400/AI-Inventory-Agent
-
-Publishing this repository shares source code; it does not host a live
-website. A reviewer can clone it and follow the setup instructions above.
-The database, secrets, environment, and logs are excluded.
+- Debug is disabled by default. Explicit local debug mode generates a temporary signing key; sessions reset on restart.
+- For deployment, configure a new private `DJANGO_SECRET_KEY` and `DJANGO_ALLOWED_HOSTS`; keep debug disabled. Generate a key locally with `python -c "import secrets; print(secrets.token_urlsafe(50))"`. Never reuse historical signing keys.
+- Keep `.env`, API keys, databases, logs, and virtual environments out of Git.
+- Automated secret checks run on pushes and pull requests. Publishing this repository shares source code; it does not deploy the application.
